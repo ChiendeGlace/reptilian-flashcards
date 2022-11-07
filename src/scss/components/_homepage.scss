@@ -1,0 +1,31 @@
+@use './variables' as v;
+
+.homepage {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 32px;
+    h2 {
+        font-size: 1.5rem;
+        color: white;
+        text-shadow: 2px 2px 2px black;
+    }
+    .deck-box {
+        padding: 2em;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 32px;
+        background-color: v.$secondary;
+        color: white;
+        margin-bottom: 1em;
+        div {
+            display: flex;
+            gap: 16px;
+        }
+        h3 {
+            font-size: 1.125rem;;
+        }
+    }   
+}

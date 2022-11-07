@@ -2,10 +2,19 @@ import { decks, container } from "./index.js";
 import { makeQuizpage, quizpage } from "./quizpage.js";
 
 const header = document.querySelector('header');
+const addDeckBtn = document.createElement('button');
+addDeckBtn.textContent = 'Create a new deck';
+addDeckBtn.classList.add('btn');
+header.appendChild(addDeckBtn);
 
-export const homepage = document.createElement('div');
 export const makeHomepage = () => {
-    makeQuizpage();
+
+    const returnButton = document.createElement('button');
+    returnButton.textContent = 'To deck selection';
+    returnButton.classList.add('btn');
+
+    const homepage = document.createElement('div');
+    homepage.classList.add('homepage');
     
     const homepageTitle = document.createElement('h2');
     homepageTitle.textContent = 'Decks'
@@ -15,32 +24,42 @@ export const makeHomepage = () => {
     (function () {
         for (let i = 0; i < decks.length; i++) {
             const deckBox = document.createElement('div');
+            deckBox.classList.add('deck-box');
             const deckBoxTitle = document.createElement('h3');
             deckBoxTitle.textContent = decks[i].deckName;
             const deckBoxBtn = document.createElement('button');
-            deckBoxBtn.textContent = 'Play the deck';
+            const buttons = document.createElement('div');
+            deckBoxBtn.textContent = 'Study now';
+            deckBoxBtn.classList.add('btn');
+            const questionBtn = document.createElement('button');
+            questionBtn.textContent = 'Manage deck';
+            questionBtn.classList.add('btn');
 
-            deckBox.append(deckBoxTitle, deckBoxBtn);
+            buttons.append(deckBoxBtn, questionBtn);
+            deckBox.append(deckBoxTitle, buttons);
             homepageDeckBox.appendChild(deckBox);
 
             const displayDeck = (e) => {
-                container.removeChild(homepage);
-                container.appendChild(quizpage);
-                const returnButton = document.createElement('button');
-                returnButton.textContent = 'To deck selection';
+                container.textContent = '';
+                container.appendChild(makeQuizpage(i));
+                header.removeChild(addDeckBtn);
                 header.appendChild(returnButton);
 
-                const restart = (e) => {
-                    container.appendChild(homepage);
-                    container.removeChild(quizpage);
+                const eraser = (e) => {
+                    container.textContent = '';
+                    container.appendChild(makeHomepage());
                     header.removeChild(returnButton);
+                    header.appendChild(addDeckBtn);
                 };
 
-                returnButton.addEventListener('click', restart);
+                returnButton.addEventListener('click', eraser);
             }
+
+        
 
             deckBoxBtn.addEventListener('click', displayDeck);
         }
+        
     })();
 
     homepage.append(homepageTitle, homepageDeckBox);

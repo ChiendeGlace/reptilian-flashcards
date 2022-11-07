@@ -1,93 +1,151 @@
 import { container, decks } from "./index.js";
+import { returnButton, makeHomepage, header } from "./homepage.js";
 
-export const quizpage = document.createElement('div');
 
-export const makeQuizpage = () => {
+export const makeQuizpage = (deckIndex) => {
+
+    const quizpage = document.createElement('div');
+    quizpage.classList.add('quizpage')
     const quizBox = document.createElement('div');
+    quizBox.classList.add('quiz-box');
     const quizPageTitle = document.createElement('h2');
-    quizPageTitle.textContent = decks[0].deckName;
-    quizBox.appendChild(quizPageTitle);
+    quizPageTitle.textContent = decks[deckIndex].deckName;
+    quizpage.appendChild(quizPageTitle);
     
     const questionSentence = document.createElement('p');
 
+    let deckCopy = [...decks[deckIndex].questions];
+
+    let result;
+    let index;
+
     const displayQuestion = (i) => {
+
         const question = document.createElement('div');
+        question.classList.add('question-box');
 
         const questionImg = document.createElement('img');
-        questionImg.src = decks[0].questions[i].source;
+        questionImg.src = deckCopy[i].source;
 
-        questionSentence.textContent = decks[0].questions[i].sentence;
-        
+        questionSentence.textContent = deckCopy[i].sentence;
+
         const correctBox = document.createElement('div');
+        correctBox.classList.add('box');
         const correctSquare = document.createElement('div');
-        correctSquare.classList.add('box');
-        
-        correctSquare.style.width = '50px';
-        correctSquare.style.height = '50px';
-        correctSquare.style.backgroundColor = 'gray';
+        correctSquare.classList.add('square');
 
         const correctText = document.createElement('p');
-        correctText.textContent = decks[0].questions[i].correct;
+        correctText.textContent = deckCopy[i].correct;
         
         const incorrectBox = document.createElement('div');
+        incorrectBox.classList.add('box');
         const incorrectSquare = document.createElement('div');
-        incorrectSquare.classList.add('box');
-
-        incorrectSquare.style.width = '50px';
-        incorrectSquare.style.height = '50px';
-        incorrectSquare.style.backgroundColor = 'gray';
+        incorrectSquare.classList.add('square');
 
         const incorrectText = document.createElement('p');
-        incorrectText.textContent = decks[0].questions[i].incorrect;
+        incorrectText.textContent = deckCopy[i].incorrect;
 
+
+        const boxes = document.createElement('div');
+        boxes.classList.add('boxes-flex');
         correctBox.append(correctSquare, correctText);
         incorrectBox.append(incorrectSquare, incorrectText);
 
         if ((Math.random())*100 > 50) {
-            question.append(questionImg, questionSentence, correctBox, incorrectBox);
+            boxes.append(incorrectBox, correctBox);
         } else {
-            question.append(questionImg, questionSentence, incorrectBox, correctBox);
+            boxes.append(correctBox, incorrectBox);
         }
+        question.append(questionImg, questionSentence, boxes);
         quizBox.appendChild(question);
 
         const showNegative = (e) => {
-            incorrectSquare.style.backgroundColor = 'red';
-            questionSentence.textContent = questionSentence.textContent.replace('[]', correctText.textContent);
+            incorrectSquare.textContent = 'X';
+            incorrectSquare.style.color = '#ef4444';
+            incorrectText.style.color = '#ef4444';
+            result = 'negative';
+            questionSentence.textContent = questionSentence.textContent.replace('[...]', correctText.textContent);
             incorrectBox.removeEventListener('click', showNegative);
             correctBox.removeEventListener('click', showPositive);
         };
         const showPositive = (e) => {
-            correctSquare.style.backgroundColor = 'green';
-            questionSentence.textContent = questionSentence.textContent.replace('[]', correctText.textContent);
+            correctSquare.textContent = 'X';
+            correctText.style.color = '#22c55e';
+            correctSquare.style.color = '#22c55e';
+            result = 'positive';
+            questionSentence.textContent = questionSentence.textContent.replace('[...]', correctText.textContent);
             incorrectBox.removeEventListener('click', showNegative);
             correctBox.removeEventListener('click', showPositive);
         };
         incorrectBox.addEventListener('click', showNegative);
         correctBox.addEventListener('click', showPositive);
     };
+
     const getRandomQuestion = () => {
         let randomArray = [];
-        for (let i = 0; i < decks[0].questions.length; i++) {
+        for (let i = 0; i < decks[deckIndex].questions.length; i++) {
             randomArray.push(i);
         }
-        console.log(randomArray);
-        return randomArray[Math.floor(Math.random() * decks[0].questions.length)]
+        index = randomArray[Math.floor(Math.random() * deckCopy.length)];
+        return index;
       };
     displayQuestion(getRandomQuestion());
 
+    const buttonDiv = document.createElement('div');
     const questionBtn = document.createElement('button');
+    questionBtn.classList.add('btn');
     questionBtn.textContent = 'Next question';
+
+    const finishQuiz = (e) => {
+        buttonDiv.removeChild(questionBtn);
+        quizBox.textContent = '';
+        const congrats = document.createElement('h2');
+        congrats.textContent = `Congratulations on finishing the ${decks[deckIndex].deckName}!`;
+        quizBox.appendChild(congrats);
+    }
+
+    const popUp = document.createElement('div');
+    popUp.classList.add('pop-up');
+    const popUpText = document.createElement('h3');
+    popUpText.textContent = 'An answer is required to continue!';
+    const popUpBtn = document.createElement('button');
+    popUpBtn.textContent = 'Understood';
+    popUpBtn.classList.add('btn');
+    popUp.append(popUpText, popUpBtn);
+
+    const goBack = (e) => {
+        quizBox.classList.remove('opacity'); 
+        buttonDiv.removeChild(popUp);
+        buttonDiv.appendChild(questionBtn);
+    }
+
     const changeQuestion = (e) => {
-        if (questionSentence.textContent.includes('[]')) {
-            alert('Answer the question');
+        if (questionSentence.textContent.includes('[...]')) {
+            quizBox.classList.add('opacity');
+            buttonDiv.appendChild(popUp);
+            buttonDiv.removeChild(questionBtn);
+
+            popUpBtn.addEventListener('click', goBack);
+            
+            
         } else {
             quizBox.textContent = '';
+            if (result == 'positive') {
+                deckCopy.splice(index, 1);
+            }
+            if (deckCopy.length == 1) {
+                questionBtn.textContent = 'Finish quiz';
+                questionBtn.removeEventListener('click', changeQuestion);
+                questionBtn.addEventListener('click', finishQuiz);
+            }
             displayQuestion(getRandomQuestion()); 
         }
     };
+
     questionBtn.addEventListener('click', changeQuestion);
 
-
-    quizpage.append(quizBox, questionBtn);
+    buttonDiv.appendChild(questionBtn);
+    quizpage.append(quizBox, buttonDiv);
     return quizpage
 };
+
