@@ -97,11 +97,17 @@ export const makeQuizpage = (deckIndex) => {
     questionBtn.textContent = 'Next question';
 
     const finishQuiz = (e) => {
-        buttonDiv.removeChild(questionBtn);
-        quizBox.textContent = '';
-        const congrats = document.createElement('h2');
-        congrats.textContent = `Congratulations on finishing the ${decks[deckIndex].deckName}!`;
-        quizBox.appendChild(congrats);
+        if (result == 'positive') {
+            buttonDiv.removeChild(questionBtn);
+            quizBox.textContent = '';
+            const congrats = document.createElement('h2');
+            congrats.textContent = `Congratulations on finishing the ${decks[deckIndex].deckName}!`;
+            quizBox.appendChild(congrats);
+        } else {
+            quizBox.textContent = '';
+            displayQuestion(0);
+        }
+
     }
 
     const popUp = document.createElement('div');
