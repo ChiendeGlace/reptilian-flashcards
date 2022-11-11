@@ -1,4 +1,4 @@
-import { addDeckBtn, homepage } from "./homepage.js";
+import { decks } from "./index.js";
 
 export const createDeck = (deckName) => {
     const questions = [];
@@ -8,5 +8,7 @@ export const createDeck = (deckName) => {
 export const createQuestion = (source, sentence, correct, incorrect) => {
     return {source, sentence, correct, incorrect}
 };
+
+
 
 

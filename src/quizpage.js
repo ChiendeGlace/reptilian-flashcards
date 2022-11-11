@@ -1,21 +1,33 @@
-import { container, decks } from "./index.js";
-import { returnButton, makeHomepage, header } from "./homepage.js";
-
+import { decks } from "./index.js";
 
 export const makeQuizpage = (deckIndex) => {
 
+    // no answer pop-up
+    const popUp = document.createElement('div');
+    const popUpText = document.createElement('h3');
+    const popUpBtn = document.createElement('button');
+    popUpText.textContent = 'An answer is required to continue!';
+    popUpBtn.textContent = 'Understood';
+    popUpBtn.classList.add('btn');
+    popUp.classList.add('pop-up');
+    popUp.append(popUpText, popUpBtn);
+
+    // quizpage body
     const quizpage = document.createElement('div');
-    quizpage.classList.add('quizpage')
     const quizBox = document.createElement('div');
-    quizBox.classList.add('quiz-box');
     const quizPageTitle = document.createElement('h2');
-    quizPageTitle.textContent = decks[deckIndex].deckName;
-    quizpage.appendChild(quizPageTitle);
-    
     const questionSentence = document.createElement('p');
+    const buttonDiv = document.createElement('div');
+    const questionBtn = document.createElement('button');
+    questionBtn.textContent = 'Next question';
+    quizPageTitle.textContent = decks[deckIndex].deckName;
+    quizpage.classList.add('quizpage')
+    quizBox.classList.add('quiz-box');
+    questionBtn.classList.add('btn');
+    quizpage.appendChild(quizPageTitle);
+    buttonDiv.appendChild(questionBtn);
 
     let deckCopy = [...decks[deckIndex].questions];
-
     let result;
     let index;
 
@@ -77,6 +89,7 @@ export const makeQuizpage = (deckIndex) => {
             incorrectBox.removeEventListener('click', showNegative);
             correctBox.removeEventListener('click', showPositive);
         };
+
         incorrectBox.addEventListener('click', showNegative);
         correctBox.addEventListener('click', showPositive);
     };
@@ -91,10 +104,6 @@ export const makeQuizpage = (deckIndex) => {
       };
     displayQuestion(getRandomQuestion());
 
-    const buttonDiv = document.createElement('div');
-    const questionBtn = document.createElement('button');
-    questionBtn.classList.add('btn');
-    questionBtn.textContent = 'Next question';
 
     const finishQuiz = (e) => {
         if (result == 'positive') {
@@ -109,15 +118,6 @@ export const makeQuizpage = (deckIndex) => {
         }
 
     }
-
-    const popUp = document.createElement('div');
-    popUp.classList.add('pop-up');
-    const popUpText = document.createElement('h3');
-    popUpText.textContent = 'An answer is required to continue!';
-    const popUpBtn = document.createElement('button');
-    popUpBtn.textContent = 'Understood';
-    popUpBtn.classList.add('btn');
-    popUp.append(popUpText, popUpBtn);
 
     const goBack = (e) => {
         quizBox.classList.remove('opacity'); 
@@ -150,7 +150,6 @@ export const makeQuizpage = (deckIndex) => {
 
     questionBtn.addEventListener('click', changeQuestion);
 
-    buttonDiv.appendChild(questionBtn);
     quizpage.append(quizBox, buttonDiv);
     return quizpage
 };

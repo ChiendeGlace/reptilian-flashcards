@@ -1,6 +1,5 @@
-import { makeHomepage, homepage } from "./homepage.js";
+import { makeHomepage } from "./homepage.js";
 import { createDeck, createQuestion } from "./functions.js";
-import { makeQuizpage, quizpage } from "./quizpage.js";
 import './scss/main.scss';
 
 
