@@ -27,9 +27,14 @@ export const makeQuizpage = (deckIndex) => {
     quizpage.appendChild(quizPageTitle);
     buttonDiv.appendChild(questionBtn);
 
+    const endEarlyBtn = document.createElement('button');
+    endEarlyBtn.classList.add('btn');
+    endEarlyBtn.textContent = 'Finish Quiz'
+
     let deckCopy = [...decks[deckIndex].questions];
     let result;
     let index;
+
 
     const displayQuestion = (i) => {
 
@@ -93,7 +98,6 @@ export const makeQuizpage = (deckIndex) => {
         incorrectBox.addEventListener('click', showNegative);
         correctBox.addEventListener('click', showPositive);
     };
-
     const getRandomQuestion = () => {
         let randomArray = [];
         for (let i = 0; i < decks[deckIndex].questions.length; i++) {
@@ -148,7 +152,12 @@ export const makeQuizpage = (deckIndex) => {
         }
     };
 
-    questionBtn.addEventListener('click', changeQuestion);
+    if (decks[deckIndex].questions.length == 1) {
+        questionBtn.textContent = 'Finish Quiz';
+        questionBtn.addEventListener('click', finishQuiz);
+    } else {
+        questionBtn.addEventListener('click', changeQuestion);
+    }
 
     quizpage.append(quizBox, buttonDiv);
     return quizpage

@@ -7,10 +7,6 @@ const header = document.querySelector('header');
 
 // displaying decks on the homepage
 
-const toHomepageButton = document.createElement('button');
-toHomepageButton.classList.add('btn');
-toHomepageButton.textContent = 'To deck selection';
-
 const renderDecks = (y) => {
     for (let i = y; i < decks.length; i++) {
         const deckBox = document.createElement('div');
@@ -91,6 +87,20 @@ const renderDecks = (y) => {
         const deckQuestionRemove = document.createElement('button');
         const deckDeckRemove = document.createElement('button');
 
+        const toHomepage = (e) => {
+            header.removeChild(toHomepageButton);
+            header.appendChild(addDeckBtn);
+            homepage.removeChild(deckManage);
+            homepageTitle.textContent = 'Decks'
+            homepageDeckBox.textContent = '';
+            container.appendChild(makeHomepage());
+        };
+
+        const toHomepageButton = document.createElement('button');
+        toHomepageButton.classList.add('btn');
+        toHomepageButton.textContent = 'To deck selection';
+        toHomepageButton.addEventListener('click', toHomepage);
+
         deckQuestionAdd.textContent = 'Add questions';
         deckQuestionRemove.textContent = 'Remove questions';
         deckDeckRemove.textContent = 'Delete deck';
@@ -120,13 +130,55 @@ const renderDecks = (y) => {
         confirmationForm.append(confirmationInput, confirmationButton);
         confirmationBox.append(confirmationText, confirmationForm);
 
+        const questionList = document.createElement('div');
+        const questionInfo = document.createElement('h3');
+        questionInfo.textContent = 'Looks like you may wanna add more questions';
+        questionList.classList.add('question-list');
+        const renderQuestions = () => {
+            if (decks[i].questions.length == 0) {
+                questionList.appendChild(questionInfo);
+            }
+            for (let j = 0; j < decks[i].questions.length; j++) {
+                const questionBox = document.createElement('div');
+                const questionImg = document.createElement('img');
+                questionImg.src = decks[i].questions[j].source;
+                const questionSentence = document.createElement('p');
+                questionSentence.textContent = decks[i].questions[j].sentence;
+                const questionCorrect = document.createElement('p');
+                questionCorrect.textContent = decks[i].questions[j].correct;
+                const questionIncorrect = document.createElement('p');
+                questionIncorrect.textContent = decks[i].questions[j].incorrect;
+                const deleteBtn = document.createElement('button');
+                const buttonDiv = document.createElement('div');
+                buttonDiv.appendChild(deleteBtn);
+                deleteBtn.textContent = 'Remove';
+                deleteBtn.classList.add('btn');
+                questionBox.append(questionImg, questionSentence, questionCorrect, questionIncorrect);
+                questionBox.classList.add('question-box');
+                questionList.append(questionBox, deleteBtn);
+
+                const deleteQuestion = (e) => {
+                    decks[i].questions.splice(j, 1);
+                    questionList.textContent = '';
+                    renderQuestions();
+                }
+
+                deleteBtn.addEventListener('click', deleteQuestion);
+            }
+        }
+        renderQuestions();
+        
+
         const deleteDeck = (e) => {
             e.preventDefault();
             if (confirmationInput.value == homepageTitle.textContent) {
                 decks.splice(i, 1);
                 homepage.removeChild(deckManage);
-                homepage.appendChild(homepageDeckBox);
                 homepageTitle.textContent = 'Decks';
+                homepageDeckBox.textContent = '';
+                container.appendChild(makeHomepage());
+                header.removeChild(toHomepageButton);
+                header.appendChild(addDeckBtn);
             }
         }
 
@@ -138,8 +190,17 @@ const renderDecks = (y) => {
 
             confirmationForm.addEventListener('submit', deleteDeck);
         };
+
+        const displayQuestionRemover = (e) => {
+            deckManage.removeChild(deckQuestionAdd);
+            deckManage.removeChild(deckQuestionRemove);
+            deckManage.removeChild(deckDeckRemove);
+            deckManage.appendChild(questionList);
+        }
+        
         //
         //
+        deckQuestionRemove.addEventListener('click', displayQuestionRemover);
         deckDeckRemove.addEventListener('click', removeDeckForm);
     
 
