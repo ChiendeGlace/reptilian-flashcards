@@ -34,6 +34,7 @@ export const makeQuizpage = (deckIndex) => {
     let deckCopy = [...decks[deckIndex].questions];
     let result;
     let index;
+    let mistakes = 0;
 
 
     const displayQuestion = (i) => {
@@ -84,6 +85,7 @@ export const makeQuizpage = (deckIndex) => {
             questionSentence.textContent = questionSentence.textContent.replace('[...]', correctText.textContent);
             incorrectBox.removeEventListener('click', showNegative);
             correctBox.removeEventListener('click', showPositive);
+            mistakes += 1;
         };
         const showPositive = (e) => {
             correctSquare.textContent = 'X';
@@ -114,8 +116,13 @@ export const makeQuizpage = (deckIndex) => {
             buttonDiv.removeChild(questionBtn);
             quizBox.textContent = '';
             const congrats = document.createElement('h2');
+            const mistakesCounter = document.createElement('p');
+            const congratsImg = document.createElement('img');
+            congratsImg.src = 'https://imgs.search.brave.com/zVMegm9l8fPvHDrg_NCsK-AtZDLhshZXu3unhLPCMgE/rs:fit:800:600:1/g:ce/aHR0cHM6Ly9jZG4u/cXVpenpjbHViLmNv/bS9pbnRlcmVzdGlu/Zy1mYWN0LzIwMTkt/MDYvdGhlc2UtYWRv/cmFibGUtcmVwdGls/ZXMtd2lsbC1tYWtl/LXlvdS1zbWlsZS00/LXRoaXMtY2hhbWVs/ZW9uLWlzLWhhcHB5/LXRvLXNlZS11cy5q/cGc';
+            mistakesCounter.textContent = `You made ${mistakes} mistakes this time`;
+            mistakesCounter.classList.add('special-p');
             congrats.textContent = `Congratulations on finishing the ${decks[deckIndex].deckName}!`;
-            quizBox.appendChild(congrats);
+            quizBox.append(congrats, mistakesCounter, congratsImg);
         } else {
             quizBox.textContent = '';
             displayQuestion(0);
@@ -130,6 +137,7 @@ export const makeQuizpage = (deckIndex) => {
     }
 
     const changeQuestion = (e) => {
+        let currentIndex = index;
         if (questionSentence.textContent.includes('[...]')) {
             quizBox.classList.add('opacity');
             buttonDiv.appendChild(popUp);
@@ -148,7 +156,13 @@ export const makeQuizpage = (deckIndex) => {
                 questionBtn.removeEventListener('click', changeQuestion);
                 questionBtn.addEventListener('click', finishQuiz);
             }
-            displayQuestion(getRandomQuestion()); 
+            let questionIndex = getRandomQuestion();
+            if (result == 'negative' && deckCopy.length > 1) {
+                while (currentIndex == questionIndex) {
+                    questionIndex = getRandomQuestion();
+                }
+            }
+            displayQuestion(questionIndex); 
         }
     };
 

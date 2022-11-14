@@ -29,6 +29,18 @@
         }
     }   
 }
+ 
+
+@media screen and (max-width: 700px) {
+    .homepage {
+        .deck-box {
+            flex-direction: column;
+        }
+    }
+}
+
+
+
 
 .deck-form {
     padding: 2em;
@@ -42,6 +54,7 @@
     background-color: v.$secondary;
     input {
         width: 100%;
+        border: 0;
         padding: 0.25em 1em;
     }
     .form {
@@ -78,6 +91,32 @@
         width: 100%;
     }
 }
+.question-adder {
+    width: 100%;
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        align-items: center;
+        justify-content: flex-start; 
+        div {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        input {
+            border: 0;
+            width: 100%;
+            padding: 0.25em 1em;
+        }
+        .question-input:valid {
+            outline: 2px solid #22c55e;
+        }
+    }
+}
+
+
 
 .confirmation-box {
     display: flex;
@@ -93,6 +132,7 @@
         align-items: center;
         justify-content: center;
         input {
+            border: 0;
             padding: 0.25em 1em;
             width: 100%;
         } 
@@ -102,7 +142,7 @@
 .question-list {
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 8px;
     .question-box {
         padding: 1em;
         width: 100%;

@@ -1,8 +1,16 @@
 import { decks, container } from "./index.js";
 import { makeQuizpage } from "./quizpage.js";
-import { createDeck } from "./functions.js";
+import { createDeck, createQuestion } from "./functions.js";
 
 const header = document.querySelector('header');
+const pageTitle = document.querySelector('h1');
+window.addEventListener('resize', function (e) {
+        if (this.window.innerWidth < 700 && pageTitle.textContent == 'Reptilian Flashcards') {
+            pageTitle.textContent = 'RP'
+        } else if (this.window.innerWidth >= 700 && pageTitle.textContent == 'RP') {
+            pageTitle.textContent = 'Reptilian Flashcards'
+        }
+});
 
 
 // displaying decks on the homepage
@@ -168,6 +176,64 @@ const renderDecks = (y) => {
         }
         renderQuestions();
         
+        const questionAdderDiv = document.createElement('div');
+        const questionAdderForm = document.createElement('form');
+        questionAdderDiv.classList.add('question-adder');
+        
+        const imageDiv = document.createElement('div');
+        const imageLabel = document.createElement('h3');
+        imageLabel.textContent = 'Image (not required)';
+        const imageInput1 = document.createElement('input');
+        imageInput1.type = 'url';
+        imageInput1.pattern="https://.*"
+        imageInput1.placeholder="https://example.jpg";
+        const imageInput2 = document.createElement('input');
+        imageInput2.type = 'file';
+        imageInput2.accept = ".png, .jpg, .jpeg";
+        imageDiv.append(imageLabel, imageInput1, imageInput2);
+
+        const sentenceDiv = document.createElement('div');
+        const sentenceLabel = document.createElement('h3');
+        sentenceLabel.textContent = 'Sentence (include [...] for the answer!)';
+        const sentenceInput = document.createElement('input');
+        sentenceInput.minLength = '5';
+        sentenceInput.pattern = ".*\\[\\.\\.\\.\\].*";
+        sentenceInput.required = true;
+        sentenceInput.title = 'Include [...]';
+        sentenceInput.classList.add('question-input');
+        sentenceInput.placeholder = "She [...] her homework yesterday";
+        sentenceDiv.append(sentenceLabel ,sentenceInput);
+        const correctDiv = document.createElement('div');
+        const correctLabel = document.createElement('h3');
+        correctLabel.textContent = 'Correct answer';
+        const correctInput = document.createElement('input');
+        correctInput.minLength = '1';
+        correctInput.required = true;
+        correctInput.classList.add('question-input');
+        correctInput.placeholder = 'did';
+        correctDiv.append(correctLabel, correctInput);
+
+        const incorrectDiv = document.createElement('div');
+        const incorrectLabel = document.createElement('h3');
+        incorrectLabel.textContent = 'Incorrect answer';
+        const incorrectInput = document.createElement('input');
+        incorrectInput.minLength = '1';
+        incorrectInput.classList.add('question-input');
+        incorrectInput.required = true;
+        incorrectInput.placeholder = 'made';
+        incorrectDiv.append(incorrectLabel, incorrectInput);
+
+        const questionAdderBtn = document.createElement('button');
+        questionAdderBtn.textContent = 'Add question';
+        questionAdderBtn.classList.add('btn');
+
+        const questionAdded = document.createElement('div');
+        const questionAddedText = document.createElement('h3');
+        questionAddedText.textContent = 'Question successfully added';
+        questionAdded.appendChild(questionAddedText);
+
+        questionAdderForm.append(imageDiv, sentenceDiv, correctDiv, incorrectDiv, questionAdderBtn);
+        questionAdderDiv.appendChild(questionAdderForm);
 
         const deleteDeck = (e) => {
             e.preventDefault();
@@ -180,6 +246,35 @@ const renderDecks = (y) => {
                 header.removeChild(toHomepageButton);
                 header.appendChild(addDeckBtn);
             }
+        }
+
+        const pushQuestion = (e) => {
+            e.preventDefault();
+            deckManage.removeChild(questionAdderDiv)
+            deckManage.appendChild(questionAdded);
+            setTimeout(() => {
+                deckManage.removeChild(questionAdded);
+                deckManage.appendChild(questionAdderDiv)
+            }, 1500);
+            const addQuestionSentence = sentenceInput.value;
+            const addQuestionCorrect = correctInput.value;
+            const addQuestionIncorrect = incorrectInput.value;
+            let addQuestionImage;
+            let newQuestion;
+            if (imageInput1.value || imageInput2.value) {
+                if (!imageInput1.value == '') {
+                    addQuestionImage = imageInput1.value;
+                } else {
+                    addQuestionImage = inputSource;
+                }
+                newQuestion = createQuestion(addQuestionImage, addQuestionSentence, addQuestionCorrect, addQuestionIncorrect);  
+            } else {
+                newQuestion = createQuestion('https://imgs.search.brave.com/7t2F7rS7ojVGj4IH3AawGA0rCH8vcDIAvflNBQNyz4A/rs:fit:736:714:1/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vNzM2/eC82YS9lYy9mMC82/YWVjZjBhODc2ODJk/ZTQyYjlhM2M4YTQ0/Y2MwMTNkNS5qcGc', addQuestionSentence, addQuestionCorrect, addQuestionIncorrect);  
+            }
+            decks[i].questions.push(newQuestion);
+            incorrectInput.value = '';
+            correctInput.value = '';
+            sentenceInput.value = '';
         }
 
         const removeDeckForm = (e) => {
@@ -196,10 +291,32 @@ const renderDecks = (y) => {
             deckManage.removeChild(deckQuestionRemove);
             deckManage.removeChild(deckDeckRemove);
             deckManage.appendChild(questionList);
-        }
+        };
         
         //
+
+        // question adder
+        const displayQuestionAddForm = (e) => {
+            deckManage.removeChild(deckQuestionAdd);
+            deckManage.removeChild(deckQuestionRemove);
+            deckManage.removeChild(deckDeckRemove);
+            deckManage.appendChild(questionAdderDiv);
+
+            questionAdderForm.addEventListener('submit', pushQuestion);
+        } ;
+
+        let inputSource;
+        imageInput2.addEventListener('change', function (e) {
+            const reader = new FileReader();
+            reader.onload = function () {
+            inputSource = reader.result;
+            console.log(inputSource);
+            }
+            reader.readAsDataURL(imageInput2.files[0]);
+        }, false);
         //
+        //
+        deckQuestionAdd.addEventListener('click', displayQuestionAddForm);
         deckQuestionRemove.addEventListener('click', displayQuestionRemover);
         deckDeckRemove.addEventListener('click', removeDeckForm);
     
